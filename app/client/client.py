@@ -4,7 +4,6 @@ from fl_networking_tools import get_binary, send_binary
 
 '''
 Responses
-LIST YOUR RESPONSE CODES HERE
 1 - Question
 '''
 
@@ -20,5 +19,10 @@ send_binary(quiz_server, ["QUESTION", ""])
 
 while playing:
     for response in get_binary(quiz_server):
+        ## Show question
         if response[0] == 1:
             print(response[1])
+            ## Ask for input
+            answer = input("Type an answer : ")
+            ## Send answer
+            send_binary(quiz_server, ["ANSWER", answer])
