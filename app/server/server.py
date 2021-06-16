@@ -12,7 +12,6 @@ ANSWER - Used to send an answer to the server for feedback
 
 ## Question model
 Question = namedtuple('Question', ['q', 'answer'])
-
 ## Questions
 q1 = Question("Expand the acronym ALU", "Arithmetic Logic Unit")
 
@@ -27,13 +26,30 @@ ready_to_start = Event()
 ## Socket handler class
 class QuizGame(socketserver.BaseRequestHandler):
     def handle(self):
+        global players_list
         ## Retrieve command from client
         for command in get_binary(self.request):
-            ## Send question
-            if command[0] == "QUESTION":
+            if command[0] == "JOIN":
+                ## Check if user has changed his name. If not, send a message
+                if command[1] == "default":
+                    todo
+                else:
+                    ## Retrieve pseudo and add it to players_list
+                    pseudo = command[1]
+                    players_list.append(pseudo)
+                    ## Confirmation message
+                    send_binary(self.request, [1, "Welcome in the networked quizz game !"])
+                    ## Wait for start
+                    ready_to_start.wait()
+                if len(players_list) == REQUIRED_PLAYERS:
+                    ## Game starting
+                    send_binary(self.request, [1, "The game is about to start !"])
+                    ## Trigger the event
+                    ready_to_start.set()
+            elif command[0] == "QUESTION":
                 send_binary(self.request, (1, q1.q))
             ## Retrieve answer
-            if command[0] == "ANSWER":
+            elif command[0] == "ANSWER":
                 answer = command[1]
                 ## Check the answer
                 if answer == q1.answer:
