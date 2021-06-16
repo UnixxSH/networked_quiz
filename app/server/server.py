@@ -2,18 +2,27 @@
 import socketserver
 from collections import namedtuple
 from fl_networking_tools import get_binary, send_binary
+from threading import Event
 
 '''
 Commands:
 QUESTION - Used to request a question from the server
+ANSWER - Used to send an answer to the server for feedback
 '''
+
 ## Question model
 Question = namedtuple('Question', ['q', 'answer'])
 
+## Questions
 q1 = Question("Expand the acronym ALU", "Arithmetic Logic Unit")
 
+## MultiThread
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
+
+REQUIRED_PLAYERS = 2
+players_list = []
+ready_to_start = Event()
 
 ## Socket handler class
 class QuizGame(socketserver.BaseRequestHandler):
