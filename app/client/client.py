@@ -25,7 +25,7 @@ pseudo = input("Pseudo : ")
 ## Request for join
 send_binary(quiz_server, ["JOIN", pseudo])
 
-##
+## Waiting loop
 while waiting:
     for response in get_binary(quiz_server):
         if response[0] == 1:
@@ -37,6 +37,7 @@ playing = True
 ## Request for question
 send_binary(quiz_server, ["QUESTION", ""])
 
+## Playing loop
 while playing:
     for response in get_binary(quiz_server):
         ## Show question

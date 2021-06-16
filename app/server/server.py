@@ -8,6 +8,7 @@ from threading import Event
 Commands:
 QUESTION - Used to request a question from the server
 ANSWER - Used to send an answer to the server for feedback
+JOIN - Used to request for join
 '''
 
 ## Question model
@@ -21,7 +22,11 @@ class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
 
 REQUIRED_PLAYERS = 2
 players_list = []
+answers_total = 0
+
+## Events
 ready_to_start = Event()
+wait_for_answers = Event()
 
 ## Socket handler class
 class QuizGame(socketserver.BaseRequestHandler):
@@ -41,11 +46,13 @@ class QuizGame(socketserver.BaseRequestHandler):
                     send_binary(self.request, [1, "Welcome in the networked quizz game !"])
                     ## Wait for start
                     ready_to_start.wait()
+                ## Check if enough players
                 if len(players_list) == REQUIRED_PLAYERS:
                     ## Game starting
                     send_binary(self.request, [1, "The game is about to start !"])
                     ## Trigger the event
                     ready_to_start.set()
+            ## Send question
             elif command[0] == "QUESTION":
                 send_binary(self.request, (1, q1.q))
             ## Retrieve answer
