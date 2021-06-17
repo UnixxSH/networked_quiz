@@ -20,7 +20,7 @@ q1 = Question("Expand the acronym ALU", "Arithmetic Logic Unit")
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
-REQUIRED_PLAYERS = 2
+required_players = 2
 players_list = []
 answers_total = 0
 
@@ -35,23 +35,19 @@ class QuizGame(socketserver.BaseRequestHandler):
         ## Retrieve command from client
         for command in get_binary(self.request):
             if command[0] == "JOIN":
-                ## Check if user has changed his name. If not, send a message
-                if command[1] == "default":
-                    todo
-                else:
-                    ## Retrieve pseudo and add it to players_list
-                    pseudo = command[1]
-                    players_list.append(pseudo)
-                    ## Confirmation message
-                    send_binary(self.request, [1, "Welcome in the networked quizz game !"])
-                    ## Wait for start
-                    ready_to_start.wait()
+                ## Retrieve pseudo and add it to players_list
+                pseudo = command[1]
+                players_list.append(pseudo)
+                ## Confirmation message
+                send_binary(self.request, [2, "Welcome in the networked quizz game !"])
                 ## Check if enough players
-                if len(players_list) == REQUIRED_PLAYERS:
+                if len(players_list) == required_players:
+                    print(players_list)
                     ## Game starting
                     send_binary(self.request, [1, "The game is about to start !"])
                     ## Trigger the event
                     ready_to_start.set()
+                ready_to_start.wait()
             ## Send question
             elif command[0] == "QUESTION":
                 send_binary(self.request, (1, q1.q))
@@ -65,6 +61,12 @@ class QuizGame(socketserver.BaseRequestHandler):
                 else:
                     ## True
                     send_binary(self.request, (1, "False"))
+            ## Send question
+            elif command[0] == "STAT":
+                if ready_to_start.is_set() and not wait_for_answers.is_set():
+                    send_binary(self.request, [3, "Quiz is starting"])
+                elif ready_to_start.is_set() and wait_for_answers.is_set():
+                    send_binary(self.request, [3, "Next question"])
 
 ## Start server, bind socket
 quiz_server = socketserver.ThreadingTCPServer(('127.0.0.1', 2065), QuizGame)
