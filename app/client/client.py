@@ -24,28 +24,24 @@ pseudo = input("Pseudo : ")
 ## Request for join
 send_binary(quiz_server, ["JOIN", pseudo])
 
-## Waiting loop
-while waiting:
-    for response in get_binary(quiz_server):
-        if response[0] == 1:
-            print(response[1])
-        ## Request for question availability
-        elif response[0] == 2:
-            print(response[1])
-            send_binary(quiz_server, ["STAT", ""])
-        elif response[0] == 3:
-            print(response[1])
-            send_binary(quiz_server, ["QUESTION", ""])
-
 playing = True
-## Request for question
-send_binary(quiz_server, ["QUESTION", ""])
 
 ## Playing loop
 while playing:
     for response in get_binary(quiz_server):
         ## Show question
         if response[0] == 1:
+            print(response[1])
+        ## Request for question availability
+        elif response[0] == 2:
+            print(response[1])
+            send_binary(quiz_server, ["STAT", ""])
+        ## Request for question
+        elif response[0] == 3:
+            print(response[1])
+            send_binary(quiz_server, ["QUESTION", ""])
+        ## Show question
+        elif response[0] == 4:
             print(response[1])
             ## Ask for input
             answer = input("Type an answer : ")
