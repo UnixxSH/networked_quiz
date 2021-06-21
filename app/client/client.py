@@ -53,6 +53,8 @@ while playing:
         elif response[0] == 5:
             print("Right answer ! Well done.")
             print("Your score is now", response[1])
+            send_binary(quiz_server, ["STAT", ""])
         elif response[0] == 6:
             print("Wrong answer...")
             print("Your score still at", response[1])
+            send_binary(quiz_server, ["STAT", ""])
