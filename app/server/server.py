@@ -25,10 +25,12 @@ quiz_questions = [
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
     pass
 
+## Variables
 required_players = 2
 players_list = []
 answers_total = 0
 current_question = None
+scores = {}
 
 ## Events
 ready_to_start = Event()
@@ -37,13 +39,15 @@ wait_for_answers = Event()
 ## Socket handler class
 class QuizGame(socketserver.BaseRequestHandler):
     def handle(self):
-        global players_list, answers_total, current_question
+        global players_list, answers_total, current_question, scores
         ## Retrieve command from client
         for command in get_binary(self.request):
             if command[0] == "JOIN":
                 ## Retrieve pseudo and add it to players_list
                 pseudo = command[1]
                 players_list.append(pseudo)
+                ## Set score to 0
+                scores[pseudo] = 0
                 ## Confirmation message
                 send_binary(self.request, [2, "Welcome in the networked quizz game !"])
                 ## Check if enough players
@@ -70,10 +74,11 @@ class QuizGame(socketserver.BaseRequestHandler):
                 wait_for_answers.wait()
                 if answer == current_question.answer:
                     ## True
-                    send_binary(self.request, (1, "True"))
+                    scores[pseudo] += 1
+                    send_binary(self.request, (5, scores[pseudo]))
                 else:
                     ## False
-                    send_binary(self.request, (1, "False"))
+                    send_binary(self.request, (6, scores[pseudo]))
                 ## Remove question from list
                 quiz_questions.remove(current_question)
                 current_question = None

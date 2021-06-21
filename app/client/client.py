@@ -7,6 +7,9 @@ Responses
 1 - Used to receive questions and feedback
 2 - Used to confirm joined game
 3 - Used to check question availability
+4 - Used to send an answer
+5 - Right answer
+6 - Wrong answer
 '''
 
 ## Waiting ?
@@ -47,3 +50,9 @@ while playing:
             answer = input("Type an answer : ")
             ## Send answer
             send_binary(quiz_server, ["ANSWER", answer])
+        elif response[0] == 5:
+            print("Right answer ! Well done.")
+            print("Your score is now", response[1])
+        elif response[0] == 6:
+            print("Wrong answer...")
+            print("Your score still at", response[1])
